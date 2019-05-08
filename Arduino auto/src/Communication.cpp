@@ -14,7 +14,7 @@ int communication_read_message() {
   if (Bluetooth.available() > 0) {
     int incomingByte = Bluetooth.read();
     if (ComStatus == WAITING_FOR_MESSAGE) {
-      if (incomingByte == '\x05') {
+      if (incomingByte == '\x01') {
         ComStatus = READING_MESSAGE;
         incomingMessage = "";
         return 0;
@@ -107,8 +107,10 @@ void comminucation_bluettooth_start(){
 
 void communication_send_beat(){
   char buffer[50] = "";
-  sprintf(buffer, MESSAGE_START + "BEAT" + MESSAGE_END);
+sprintf(buffer, "\x05\x02\x01\x01SENDING_BEAT\x03\x04");
+  Serial.println(buffer);
   Bluetooth.write(buffer);
+  delay(250);
 }
 
 void communication_forward_message(){

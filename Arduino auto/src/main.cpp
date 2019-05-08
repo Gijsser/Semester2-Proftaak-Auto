@@ -28,12 +28,15 @@ void setup(){
 
 void loop(){
   static unsigned long sinceLastMessage = millis();
+  Serial.println("Hoi");
   if (ConStatus == NOK){
     communication_send_beat();
+    Serial.println("SENDING BEAT");
     if (communication_read_message() == 1){
       String Parsed[2];
       communication_parse_message(Parsed,2);
       if(Parsed[0] == "ACK"){
+        Serial.println("ACK");
         ConStatus = OK;
         sinceLastMessage = millis();
       }
@@ -41,6 +44,7 @@ void loop(){
     delay(200);
   }
   if (ConStatus == OK){
+    Serial.println("CON OK");
     if(communication_read_message() == 1){
       String Parsed [2];
       communication_parse_message(Parsed,2);

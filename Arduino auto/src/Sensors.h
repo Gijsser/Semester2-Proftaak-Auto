@@ -3,6 +3,6 @@
 
 #define STEERING_WHEEL (A0)
 
-int get_steeringwheel_position();
+void get_steeringwheel_position();
 
 #endif

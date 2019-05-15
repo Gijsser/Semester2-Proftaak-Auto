@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-
+#include <string.h>
 #include "Communication.h"
 
 SoftwareSerial Bluetooth(10, 11);
@@ -14,14 +14,14 @@ int communication_read_message() {
   if (Bluetooth.available() > 0) {
     int incomingByte = Bluetooth.read();
     if (ComStatus == WAITING_FOR_MESSAGE) {
-      if (incomingByte == '\x01') {
-        ComStatus = READING_MESSAGE;
+      if (incomingByte == MESSAGE_START) {
+        ComStatus = READING_MESSAGE_BLUETOOTH;
         incomingMessage = "";
         return 0;
       }
     }
-    if (ComStatus == READING_MESSAGE) {
-      if (incomingByte == '\x04') {
+    else if (ComStatus == READING_MESSAGE_BLUETOOTH) {
+      if (incomingByte == MESSAGE_END) {
         ComStatus = WAITING_FOR_MESSAGE;
         LastMessage = BLUETOOTHCOM;
         return 1;
@@ -31,21 +31,23 @@ int communication_read_message() {
       }
     }
   }
+
   else if(Serial.available() > 0){
       int incomingByte = Serial.read();
       if (ComStatus == WAITING_FOR_MESSAGE) {
-        if (incomingByte == '\x05') {
-          ComStatus = READING_MESSAGE;
+        if (incomingByte == MESSAGE_START) {
+          ComStatus = READING_MESSAGE_SERIAL;
           incomingMessage = "";
           return 0;
         }
       }
-      if (ComStatus == READING_MESSAGE) {
-        if (incomingByte == '\x04') {
+      else if (ComStatus == READING_MESSAGE_SERIAL) {
+        if (incomingByte == MESSAGE_END) {
           ComStatus = WAITING_FOR_MESSAGE;
           LastMessage = SERIALCOM;
           return 1;
-        } else {
+        }
+        else {
           incomingMessage += (char)incomingByte;
           return 0;
         }
@@ -54,39 +56,10 @@ int communication_read_message() {
   return 0;
 }
 
-void communication_send_sensor(int sensor, int distance) {
-  char buffer[50] = "";
-  switch (sensor) {
-  case 0:
-    sprintf(buffer, "\x05\x02\x01\x01SENSOR_LEFT_STATUS:%d\x03\x04", distance);
-    Bluetooth.write(buffer);
-    // Serial.write(buffer);
-    return;
-  case 1:
-    sprintf(buffer, "\x05\x02\x01\x01SENSOR_MIDDLE_LEFT_STATUS:%d\x03\x04",
-            distance);
-    Bluetooth.write(buffer);
-    // Serial.write(buffer);
-    return;
-  case 2:
-    sprintf(buffer, "\x05\x02\x01\x01SENSOR_MIDDLE_RIGHT_STATUS:%d\x03\x04",
-            distance);
-    Bluetooth.write(buffer);
-    // Serial.write(buffer);
-    return;
-  case 3:
-    sprintf(buffer, "\x05\x02\x01\x01SENSOR_RIGHT_STATUS:%d\x03\x04", distance);
-    Bluetooth.write(buffer);
-    // Serial.write(buffer);
-    return;
-  }
-}
-
-void communication_parse_message (String *Parsed,
-                                 int size) { // kijken bij watch.c
+void communication_parse_message (String *Parsed, int size) { 
   String parsed;
 
-  for (uint8_t i = 1; i < incomingMessage.length(); i++) {
+  for (uint8_t i = 0; i < incomingMessage.length(); i++) {
     parsed = parsed + incomingMessage[i];
   }
 
@@ -95,7 +68,7 @@ void communication_parse_message (String *Parsed,
   if (delimiterIndex > 0) {
     Parsed[0] = parsed.substring(0, delimiterIndex);
     Parsed[1] = parsed.substring(delimiterIndex + 1, (parsed.length()));
-    Serial.println(Parsed[1]);
+    //Serial.println(Parsed[1]);
   } else {
     Parsed[0] = parsed;
   }
@@ -105,26 +78,16 @@ void comminucation_bluettooth_start(){
   Bluetooth.begin(9600);
 }
 
-void communication_send_beat(){
+void communication_send_message(String message, int value){
   char buffer[50] = "";
-sprintf(buffer, "\x05\x02\x01\x01SENDING_BEAT\x03\x04");
-  Serial.println(buffer);
-  Bluetooth.write(buffer);
-  delay(250);
-}
-
-void communication_forward_message(){
-
   switch (LastMessage) {
     case SERIALCOM:
-    Bluetooth.print(MESSAGE_START);
-    Bluetooth.print(incomingMessage);
-    Bluetooth.print(MESSAGE_END);
+    sprintf(buffer, "%c%s:%i%c", MESSAGE_START,message.c_str(), value, MESSAGE_END);
+    Bluetooth.write(buffer);
     break;
     case BLUETOOTHCOM:
-    Serial.print(MESSAGE_START);
-    Serial.print(incomingMessage);
-    Serial.print(MESSAGE_END);
+    sprintf(buffer, "%c%s:%i%c", MESSAGE_START,message.c_str(), value, MESSAGE_END);
+    Serial.write(buffer);
     break;
   }
 }

@@ -5,21 +5,12 @@
 
 #define MAX_TIME (5000)
 
+typedef enum { OFF = 0, SOUND = 1, ASSIST = 2 } TrailerState;
 
-typedef enum {
-  OFF = 0,
-  SOUND = 1,
-  ASSIST = 2
-} TrailerState;
+typedef enum {  NOK = 0, OK = 1 } CommunicationState;
 
-typedef enum
-{
-  NOK = 0,
-  OK = 1
-} CommunicationState;
-
-TrailerState TrailerStatus = OFF;
-CommunicationState ConStatus = NOK;
+TrailerState TrailerStatus = ASSIST;
+CommunicationState ConStatus = OK;
 
 void setup(){
   Serial.begin(9600);
@@ -28,22 +19,22 @@ void setup(){
 
 void loop(){
   static unsigned long sinceLastMessage = millis();
-  Serial.println("Hoi");
-  if (ConStatus == NOK){
-    communication_send_beat();
-    Serial.println("SENDING BEAT");
+
+  switch (ConStatus) {
+    case NOK:
     if (communication_read_message() == 1){
       String Parsed[2];
       communication_parse_message(Parsed,2);
+      Serial.println(Parsed[0]);
       if(Parsed[0] == "ACK"){
         Serial.println("ACK");
         ConStatus = OK;
         sinceLastMessage = millis();
       }
     }
-    delay(200);
-  }
-  if (ConStatus == OK){
+    break;
+
+    case OK:
     Serial.println("CON OK");
     if(communication_read_message() == 1){
       String Parsed [2];
@@ -57,11 +48,16 @@ void loop(){
       if (Parsed[0] == "TLR_ASSIST"){
         TrailerStatus = ASSIST;
       }
-      communication_forward_message();
+      communication_send_message(Parsed[1], Parsed[2].toInt());
       sinceLastMessage = millis();
     }
+    break;
   }
-  if (sinceLastMessage > MAX_TIME){
+
+  if ((millis()-sinceLastMessage) > MAX_TIME){
+    communication_send_message("BEAT");
     ConStatus = NOK;
   }
+
+  get_steeringwheel_position();
 }

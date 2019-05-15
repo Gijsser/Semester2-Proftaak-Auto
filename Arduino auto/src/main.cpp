@@ -10,7 +10,8 @@ typedef enum { OFF = 0, SOUND = 1, ASSIST = 2 } TrailerState;
 typedef enum {  NOK = 0, OK = 1 } CommunicationState;
 
 TrailerState TrailerStatus = ASSIST;
-CommunicationState ConStatus = OK;
+CommunicationState ConStatus = NOK;
+unsigned long sinceLastMessage = 0;
 
 void setup(){
   Serial.begin(9600);
@@ -18,7 +19,7 @@ void setup(){
 }
 
 void loop(){
-  static unsigned long sinceLastMessage = millis();
+
 
   switch (ConStatus) {
     case NOK:
@@ -56,6 +57,8 @@ void loop(){
 
   if ((millis()-sinceLastMessage) > MAX_TIME){
     communication_send_message("BEAT");
+    sinceLastMessage = millis();
+    Serial.println("Beat");
     ConStatus = NOK;
   }
 

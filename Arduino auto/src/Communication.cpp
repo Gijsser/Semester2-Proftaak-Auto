@@ -14,6 +14,8 @@ int timeNoBeatAck = 0;
 
 String incomingMessage = "";
 
+int get_connect_status(){return ConStatus;}
+
 void communication_Test_connection(){
   int timer;
   if (ConStatus = NOK){
@@ -28,7 +30,7 @@ void communication_Test_connection(){
     Serial.println("Beat");
     timeNoBeatAck++;
     if(timeNoBeatAck>5){
-      ConStatus = NOK;
+    //  ConStatus = NOK;
     }
 
   }

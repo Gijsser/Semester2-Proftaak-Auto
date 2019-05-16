@@ -19,8 +19,8 @@ void setup(){
 void loop(){
 
   communication_Test_connection();
-  switch (ConStatus) {
-    case NOK:
+  switch (get_connect_status()) {
+    case 0:
     if (communication_read_message() == 1){
       String Parsed[2];
       communication_parse_message(Parsed,2);
@@ -34,7 +34,7 @@ void loop(){
     }
     break;
 
-    case OK:
+    case 1:
     Serial.println("CON OK");
     if(communication_read_message() == 1){
       String Parsed [2];

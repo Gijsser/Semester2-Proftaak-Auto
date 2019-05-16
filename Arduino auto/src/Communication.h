@@ -23,6 +23,7 @@ extern CommunicationState ConStatus;
 extern unsigned long sinceLastMessage;
 extern int timeNoBeatAck;
 
+int get_connect_status();
 int communication_read_message();
 void communication_parse_message(String *Parsed, int size );
 void comminucation_bluettooth_start();

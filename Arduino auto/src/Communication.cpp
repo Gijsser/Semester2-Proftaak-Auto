@@ -8,8 +8,32 @@ SoftwareSerial Bluetooth(10, 11);
 ComState ComStatus = WAITING_FOR_MESSAGE;
 LastRecieved LastMessage = SERIALCOM;
 
+CommunicationState ConStatus = NOK;
+unsigned long sinceLastMessage = 0;
+int timeNoBeatAck = 0;
+
 String incomingMessage = "";
 
+void communication_Test_connection(){
+  int timer;
+  if (ConStatus = NOK){
+    timer = 500;
+  }
+  else{
+    timer = 5000;
+  }
+  if ((millis()-sinceLastMessage) > timer){
+    communication_send_message("BEAT", BLUETOOTHCOM);
+    sinceLastMessage = millis();
+    Serial.println("Beat");
+    timeNoBeatAck++;
+    if(timeNoBeatAck>5){
+      ConStatus = NOK;
+    }
+
+  }
+
+}
 int communication_read_message() {
   if (Bluetooth.available() > 0) {
     int incomingByte = Bluetooth.read();

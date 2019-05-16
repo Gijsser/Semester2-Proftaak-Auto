@@ -7,11 +7,9 @@
 
 typedef enum { OFF = 0, SOUND = 1, ASSIST = 2 } TrailerState;
 
-typedef enum {  NOK = 0, OK = 1 } CommunicationState;
+
 
 TrailerState TrailerStatus = ASSIST;
-CommunicationState ConStatus = NOK;
-unsigned long sinceLastMessage = 0;
 
 void setup(){
   Serial.begin(9600);
@@ -20,7 +18,7 @@ void setup(){
 
 void loop(){
 
-
+  communication_Test_connection();
   switch (ConStatus) {
     case NOK:
     if (communication_read_message() == 1){
@@ -30,6 +28,7 @@ void loop(){
       if(Parsed[0] == "ACK"){
         Serial.println("ACK");
         ConStatus = OK;
+        timeNoBeatAck = 0;
         sinceLastMessage = millis();
       }
     }
@@ -51,16 +50,12 @@ void loop(){
       }
       communication_send_message(Parsed[1], Parsed[2].toInt(), BOTH);
       sinceLastMessage = millis();
+      timeNoBeatAck = 0;
     }
     break;
   }
 
-  if ((millis()-sinceLastMessage) > MAX_TIME){
-    communication_send_message("BEAT", BLUETOOTHCOM);
-    sinceLastMessage = millis();
-    Serial.println("Beat");
-    ConStatus = NOK;
-  }
+
 
   get_steeringwheel_position();
 }

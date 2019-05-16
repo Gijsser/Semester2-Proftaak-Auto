@@ -19,7 +19,7 @@ void setup(){
 void loop(){
 
   communication_Test_connection();
-  switch (get_connect_status()) {
+  switch (ConStatus) {
     case 0:
     if (communication_read_message() == 1){
       String Parsed[2];

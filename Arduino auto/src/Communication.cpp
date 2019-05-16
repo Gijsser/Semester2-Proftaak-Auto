@@ -56,7 +56,7 @@ int communication_read_message() {
   return 0;
 }
 
-void communication_parse_message (String *Parsed, int size) { 
+void communication_parse_message (String *Parsed, int size) {
   String parsed;
 
   for (uint8_t i = 0; i < incomingMessage.length(); i++) {
@@ -78,16 +78,19 @@ void comminucation_bluettooth_start(){
   Bluetooth.begin(9600);
 }
 
-void communication_send_message(String message, int value){
+void communication_send_message(String message, int value, LastRecieved sendTo){
   char buffer[50] = "";
-  switch (LastMessage) {
-    case SERIALCOM:
-    sprintf(buffer, "%c%s:%i%c", MESSAGE_START,message.c_str(), value, MESSAGE_END);
+  sprintf(buffer, "%c%s:%i%c", MESSAGE_START,message.c_str(), value, MESSAGE_END);
+  switch (sendTo) {
+    case BLUETOOTHCOM:
     Bluetooth.write(buffer);
     break;
-    case BLUETOOTHCOM:
-    sprintf(buffer, "%c%s:%i%c", MESSAGE_START,message.c_str(), value, MESSAGE_END);
+    case SERIALCOM:
     Serial.write(buffer);
+    break;
+    case BOTH:
+    Serial.write(buffer);
+    Bluetooth.write(buffer);
     break;
   }
 }

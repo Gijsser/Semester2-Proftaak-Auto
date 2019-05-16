@@ -49,14 +49,14 @@ void loop(){
       if (Parsed[0] == "TLR_ASSIST"){
         TrailerStatus = ASSIST;
       }
-      communication_send_message(Parsed[1], Parsed[2].toInt());
+      communication_send_message(Parsed[1], Parsed[2].toInt(), BOTH);
       sinceLastMessage = millis();
     }
     break;
   }
 
   if ((millis()-sinceLastMessage) > MAX_TIME){
-    communication_send_message("BEAT");
+    communication_send_message("BEAT", BLUETOOTHCOM);
     sinceLastMessage = millis();
     Serial.println("Beat");
     ConStatus = NOK;

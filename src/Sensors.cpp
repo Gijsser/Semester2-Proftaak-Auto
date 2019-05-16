@@ -8,7 +8,7 @@ int lastPosition = 0;
 void get_steeringwheel_position(){
   int newPosition = analogRead(STEERING_WHEEL);
   if (newPosition != lastPosition){
-    communication_send_message("WHEEL_POS", newPosition);
+    communication_send_message("WHEEL_POS", newPosition, BOTH);
     lastPosition = newPosition;
   }
 }

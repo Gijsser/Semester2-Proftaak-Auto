@@ -14,23 +14,21 @@ int timeNoBeatAck = 0;
 
 String incomingMessage = "";
 
-int get_connect_status(){return ConStatus;}
-
 void communication_Test_connection(){
   int timer;
   if (ConStatus = NOK){
-    timer = 500;
+    timer = 250;
   }
   else{
-    timer = 5000;
+    timer = 1000;
   }
   if ((millis()-sinceLastMessage) > timer){
     communication_send_message("BEAT", BLUETOOTHCOM);
     sinceLastMessage = millis();
-    Serial.println("Beat");
+    //Serial.println("Beat");
     timeNoBeatAck++;
     if(timeNoBeatAck>5){
-    //  ConStatus = NOK;
+      ConStatus = NOK;
     }
 
   }

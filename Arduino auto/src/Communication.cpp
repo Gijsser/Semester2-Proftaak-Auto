@@ -16,8 +16,8 @@ String incomingMessage = "";
 
 void communication_Test_connection(){
   int timer;
-  if (ConStatus = NOK){
-    timer = 250;
+  if (ConStatus == NOK){
+    timer = 100;
   }
   else{
     timer = 1000;

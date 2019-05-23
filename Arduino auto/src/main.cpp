@@ -40,13 +40,23 @@ void loop(){
         if (Parsed[0] == "TRL_OFF"){
           TrailerStatus = OFF;
         }
-        if (Parsed[0] == "TRL_SOUND"){
+        else if (Parsed[0] == "TRL_SOUND"){
           TrailerStatus = SOUND;
         }
-        if (Parsed[0] == "TLR_ASSIST"){
+        else if (Parsed[0] == "TLR_ASSIST"){
           TrailerStatus = ASSIST;
         }
-        communication_send_message(Parsed[1], Parsed[2].toInt(), BOTH);
+        else if (
+          Parsed[0] == "TRAILER_CONECTION"||
+          Parsed[0] == "SENSOR_LEFT_STATUS"||
+          Parsed[0] == "SENSOR_MIDDLE_LEFT_STATUS"||
+          Parsed[0] == "SENSOR_MIDDLE_RIGHT_STATUS"||
+          Parsed[0] == "SENSOR_RIGHT_STATUS")
+          {
+          communication_send_message(Parsed[1], Parsed[2].toInt(), SERIALCOM);
+        }
+
+        //communication_send_message(Parsed[1], Parsed[2].toInt(), BOTH);
         sinceLastMessage = millis();
         timeNoBeatAck = 0;
       }

@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#include "Communication.h"
 #ifndef _SENSORS_H
 #define _SENSORS_H
 

@@ -1,3 +1,6 @@
+#include <Arduino.h>
+#include <SoftwareSerial.h>
+#include <string.h>
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
 
@@ -26,7 +29,7 @@ extern CommunicationState ConStatus;
 
 int get_connect_status();
 int communication_read_message();
-void communication_parse_message(String * Parsed, String * incommingMessage );
+void communication_parse_message(String * Parsed, String * incommingMessage);
 void comminucation_bluettooth_start();
 void communication_send_message(String message, int value = 0, LastRecieved sendTo = BOTH);
 void communication_Test_connection(unsigned long * sinceLastMessage);

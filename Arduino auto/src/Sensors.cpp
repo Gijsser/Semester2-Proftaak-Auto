@@ -1,7 +1,4 @@
-#include <Arduino.h>
-
 #include "Sensors.h"
-#include "Communication.h"
 
 void get_steeringwheel_position(int  * lastPosition){
   static unsigned long timer = 0;

@@ -23,7 +23,7 @@ void loop(){
 
   switch (ConStatus) {
     case 0:
-      if (communication_read_message() == 1){
+      if (communication_read_message()){
         String Parsed[2];
         communication_parse_message(Parsed, &incommingMessage);
         Serial.println(Parsed[0]);
@@ -36,7 +36,7 @@ void loop(){
 
     case 1:
       Serial.println("CON OK");
-      if(communication_read_message() == 1){
+      if(communication_read_message()){
         String Parsed [2];
         communication_parse_message(Parsed, &incommingMessage);
         if (Parsed[0] == "TRL_OFF"){

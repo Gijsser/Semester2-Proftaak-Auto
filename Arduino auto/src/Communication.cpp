@@ -1,7 +1,3 @@
-#include <Arduino.h>
-#include <SoftwareSerial.h>
-#include <string.h>
-
 #include "Communication.h"
 
 SoftwareSerial Bluetooth(10, 11);
@@ -76,7 +72,7 @@ int communication_read_message() {
   return 0;
 }
 
-void communication_parse_message (String *Parsed, String * incomingMessage ,int size) {
+void communication_parse_message (String *Parsed, String * incomingMessage) {
   String toParse = * incomingMessage;
 
   int delimiterIndex = toParse.indexOf(DELIMITER); // als mid-marker

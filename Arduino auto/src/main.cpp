@@ -15,19 +15,21 @@ void setup(){
 }
 
 void loop(){
+  static String incommingMessage = "";
+  static unsigned long timeSinceLastMessage = 0;
+  static int lastSteeringWheelPos = 0;
 
-  communication_Test_connection();
+  communication_Test_connection(&timeSinceLastMessage);
+
   switch (ConStatus) {
     case 0:
       if (communication_read_message() == 1){
         String Parsed[2];
-        communication_parse_message(Parsed,2);
+        communication_parse_message(Parsed, &incommingMessage);
         Serial.println(Parsed[0]);
         if(Parsed[0] == "ACK"){
           Serial.println("ACK");
           ConStatus = OK;
-          timeNoBeatAck = 0;
-          sinceLastMessage = millis();
         }
       }
     break;
@@ -36,15 +38,18 @@ void loop(){
       Serial.println("CON OK");
       if(communication_read_message() == 1){
         String Parsed [2];
-        communication_parse_message(Parsed,2);
+        communication_parse_message(Parsed, &incommingMessage);
         if (Parsed[0] == "TRL_OFF"){
           TrailerStatus = OFF;
+          communication_send_message(Parsed[0], Parsed[1].toInt(), BLUETOOTHCOM);
         }
         else if (Parsed[0] == "TRL_SOUND"){
           TrailerStatus = SOUND;
+          communication_send_message(Parsed[0], Parsed[1].toInt(), BLUETOOTHCOM);
         }
         else if (Parsed[0] == "TLR_ASSIST"){
           TrailerStatus = ASSIST;
+          communication_send_message(Parsed[0], Parsed[1].toInt(), BLUETOOTHCOM);
         }
         else if (
           Parsed[0] == "TRAILER_CONECTION"||
@@ -53,14 +58,10 @@ void loop(){
           Parsed[0] == "SENSOR_MIDDLE_RIGHT_STATUS"||
           Parsed[0] == "SENSOR_RIGHT_STATUS")
           {
-          communication_send_message(Parsed[1], Parsed[2].toInt(), SERIALCOM);
+          communication_send_message(Parsed[0], Parsed[1].toInt(), SERIALCOM);
         }
-
-        //communication_send_message(Parsed[1], Parsed[2].toInt(), BOTH);
-        sinceLastMessage = millis();
-        timeNoBeatAck = 0;
       }
     break;
   }
-  get_steeringwheel_position();
+  get_steeringwheel_position(&lastSteeringWheelPos);
 }

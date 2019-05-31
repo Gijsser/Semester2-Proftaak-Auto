@@ -1,46 +1,42 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 #include <string.h>
+
 #include "Communication.h"
 
 SoftwareSerial Bluetooth(10, 11);
 
 ComState ComStatus = WAITING_FOR_MESSAGE;
 LastRecieved LastMessage = SERIALCOM;
-
 CommunicationState ConStatus = NOK;
-unsigned long sinceLastMessage = 0;
-int timeNoBeatAck = 0;
 
-String incomingMessage = "";
-
-void communication_Test_connection(){
-  int timer;
+void communication_Test_connection(unsigned long * sinceLastMessage){
+  static unsigned long timeNoBeatAck = 0;
+  unsigned long timer;
   if (ConStatus == NOK){
     timer = 100;
   }
   else{
     timer = 1000;
   }
-  if ((millis()-sinceLastMessage) > timer){
+  if ((millis()- *sinceLastMessage) > timer){
     communication_send_message("BEAT", BLUETOOTHCOM);
-    sinceLastMessage = millis();
+    *sinceLastMessage = millis();
     //Serial.println("Beat");
     timeNoBeatAck++;
     if(timeNoBeatAck>5){
       ConStatus = NOK;
     }
-
   }
-
 }
-int communication_read_message() {
+
+int communication_read_message(String * incomingMessage) {
   if (Bluetooth.available() > 0) {
     int incomingByte = Bluetooth.read();
     if (ComStatus == WAITING_FOR_MESSAGE) {
       if (incomingByte == MESSAGE_START) {
         ComStatus = READING_MESSAGE_BLUETOOTH;
-        incomingMessage = "";
+        *incomingMessage = "";
         return 0;
       }
     }
@@ -61,7 +57,7 @@ int communication_read_message() {
       if (ComStatus == WAITING_FOR_MESSAGE) {
         if (incomingByte == MESSAGE_START) {
           ComStatus = READING_MESSAGE_SERIAL;
-          incomingMessage = "";
+          * incomingMessage = "";
           return 0;
         }
       }
@@ -72,7 +68,7 @@ int communication_read_message() {
           return 1;
         }
         else {
-          incomingMessage += (char)incomingByte;
+          * incomingMessage += (char)incomingByte;
           return 0;
         }
       }
@@ -80,21 +76,17 @@ int communication_read_message() {
   return 0;
 }
 
-void communication_parse_message (String *Parsed, int size) {
-  String parsed;
+void communication_parse_message (String *Parsed, String * incomingMessage ,int size) {
+  String toParse = * incomingMessage;
 
-  for (uint8_t i = 0; i < incomingMessage.length(); i++) {
-    parsed = parsed + incomingMessage[i];
-  }
-
-  int delimiterIndex = parsed.indexOf(DELIMITER); // als mid-marker
+  int delimiterIndex = toParse.indexOf(DELIMITER); // als mid-marker
 
   if (delimiterIndex > 0) {
-    Parsed[0] = parsed.substring(0, delimiterIndex);
-    Parsed[1] = parsed.substring(delimiterIndex + 1, (parsed.length()));
+    Parsed[0] = toParse.substring(0, delimiterIndex);
+    Parsed[1] = toParse.substring(delimiterIndex + 1, (toParse.length()));
     //Serial.println(Parsed[1]);
   } else {
-    Parsed[0] = parsed;
+    Parsed[0] = toParse;
   }
 }
 

@@ -8,6 +8,7 @@
 typedef enum { OFF = 0, SOUND = 1, ASSIST = 2 } TrailerState;
 
 TrailerState TrailerStatus = ASSIST;
+bool waitingForAck = false;
 
 void setup(){
   Serial.begin(9600);
@@ -19,16 +20,22 @@ void loop(){
   static unsigned long timeSinceLastMessage = 0;
   static int lastSteeringWheelPos = 0;
 
-  communication_Test_connection(&timeSinceLastMessage);
+  //if(waitingForAck == false){
+  //  if(millis() - timeSinceLastMessage > 2000){
+      communication_send_message("BEAT");
+    //  waitingForAck = true;
+    //}
+//}
 
   switch (ConStatus) {
     case 0:
-      if (communication_read_message()){
+      if (communication_read_message(&incommingMessage)){
         String Parsed[2];
         communication_parse_message(Parsed, &incommingMessage);
         Serial.println(Parsed[0]);
         if(Parsed[0] == "ACK"){
           Serial.println("ACK");
+          waitingForAck = false;
           ConStatus = OK;
         }
       }
@@ -36,7 +43,7 @@ void loop(){
 
     case 1:
       Serial.println("CON OK");
-      if(communication_read_message()){
+      if(communication_read_message(&incommingMessage)){
         String Parsed [2];
         communication_parse_message(Parsed, &incommingMessage);
         if (Parsed[0] == "TRL_OFF"){
@@ -64,4 +71,5 @@ void loop(){
     break;
   }
   get_steeringwheel_position(&lastSteeringWheelPos);
+  delay(100);
 }

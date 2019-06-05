@@ -28,7 +28,7 @@ typedef enum {
 extern CommunicationState ConStatus;
 
 int get_connect_status();
-int communication_read_message();
+int communication_read_message(String * incommingMessage);
 void communication_parse_message(String * Parsed, String * incommingMessage);
 void comminucation_bluettooth_start();
 void communication_send_message(String message, int value = 0, LastRecieved sendTo = BOTH);

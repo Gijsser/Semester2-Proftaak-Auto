@@ -26,7 +26,7 @@ void communication_Test_connection(unsigned long * sinceLastMessage){
   }
 }
 
-int communication_read_message() {
+int communication_read_message(String * incomingMessage) {
   if (Bluetooth.available() > 0) {
     int incomingByte = Bluetooth.read();
     if (ComStatus == WAITING_FOR_MESSAGE) {
@@ -42,7 +42,7 @@ int communication_read_message() {
         LastMessage = BLUETOOTHCOM;
         return 1;
       } else {
-        incomingMessage += (char)incomingByte;
+        *incomingMessage += (char)incomingByte;
         return 0;
       }
     }

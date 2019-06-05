@@ -7,7 +7,7 @@
 
 typedef enum { OFF = 0, SOUND = 1, ASSIST = 2 } TrailerState;
 
-TrailerState TrailerStatus = ASSIST;
+TrailerState TrailerStatus = SOUND;
 bool waitingForAck = false;
 
 void setup(){
@@ -20,12 +20,12 @@ void loop(){
   static unsigned long timeSinceLastMessage = 0;
   static int lastSteeringWheelPos = 0;
 
-  //if(waitingForAck == false){
-  //  if(millis() - timeSinceLastMessage > 2000){
+  if(waitingForAck == false){
+    if(millis() - timeSinceLastMessage > 2000){
       communication_send_message("BEAT");
-    //  waitingForAck = true;
-    //}
-//}
+      waitingForAck = true;
+    }
+}
 
   switch (ConStatus) {
     case 0:
@@ -42,7 +42,7 @@ void loop(){
     break;
 
     case 1:
-      Serial.println("CON OK");
+      //Serial.println("CON OK");
       if(communication_read_message(&incommingMessage)){
         String Parsed [2];
         communication_parse_message(Parsed, &incommingMessage);
@@ -66,10 +66,13 @@ void loop(){
           Parsed[0] == "SENSOR_RIGHT_STATUS")
           {
           communication_send_message(Parsed[0], Parsed[1].toInt(), SERIALCOM);
+          communication_send_message("Ack",0,BLUETOOTHCOM);
         }
       }
     break;
   }
-  get_steeringwheel_position(&lastSteeringWheelPos);
-  delay(100);
+  if(TrailerStatus == ASSIST){
+      get_steeringwheel_position(&lastSteeringWheelPos);
+  }
+  //delay(100);
 }

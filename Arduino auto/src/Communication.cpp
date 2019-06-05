@@ -10,7 +10,7 @@ void communication_Test_connection(unsigned long * sinceLastMessage){
   static unsigned long timeNoBeatAck = 0;
   unsigned long timer;
   if (ConStatus == NOK){
-    timer = 100;
+    timer = 1000;
   }
   else{
     timer = 1000;
@@ -26,13 +26,13 @@ void communication_Test_connection(unsigned long * sinceLastMessage){
   }
 }
 
-int communication_read_message(String * incomingMessage) {
+int communication_read_message(String * incommingMessage) {
   if (Bluetooth.available() > 0) {
     int incomingByte = Bluetooth.read();
     if (ComStatus == WAITING_FOR_MESSAGE) {
       if (incomingByte == MESSAGE_START) {
         ComStatus = READING_MESSAGE_BLUETOOTH;
-        *incomingMessage = "";
+        *incommingMessage = "";
         return 0;
       }
     }
@@ -42,7 +42,7 @@ int communication_read_message(String * incomingMessage) {
         LastMessage = BLUETOOTHCOM;
         return 1;
       } else {
-        *incomingMessage += (char)incomingByte;
+        *incommingMessage += (char)incomingByte;
         return 0;
       }
     }
@@ -53,7 +53,7 @@ int communication_read_message(String * incomingMessage) {
       if (ComStatus == WAITING_FOR_MESSAGE) {
         if (incomingByte == MESSAGE_START) {
           ComStatus = READING_MESSAGE_SERIAL;
-          * incomingMessage = "";
+          * incommingMessage = "";
           return 0;
         }
       }
@@ -64,7 +64,7 @@ int communication_read_message(String * incomingMessage) {
           return 1;
         }
         else {
-          * incomingMessage += (char)incomingByte;
+          * incommingMessage += (char)incomingByte;
           return 0;
         }
       }

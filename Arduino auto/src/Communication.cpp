@@ -95,14 +95,14 @@ void communication_send_message(String message, int value, LastRecieved sendTo){
   sprintf(buffer, "%c%s:%i%c", MESSAGE_START,message.c_str(), value, MESSAGE_END);
   switch (sendTo) {
     case BLUETOOTHCOM:
-    Bluetooth.write(buffer);
+    Bluetooth.println(buffer);
     break;
     case SERIALCOM:
-    Serial.write(buffer);
+    Serial.println(buffer);
     break;
     case BOTH:
-    Serial.write(buffer);
-    Bluetooth.write(buffer);
+    Serial.println(buffer);
+    Bluetooth.println(buffer);
     break;
   }
 }

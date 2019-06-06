@@ -7,7 +7,7 @@
 
 typedef enum { OFF = 0, SOUND = 1, ASSIST = 2 } TrailerState;
 
-TrailerState TrailerStatus = SOUND;
+TrailerState TrailerStatus = OFF;
 bool waitingForAck = false;
 
 void setup(){
@@ -20,12 +20,13 @@ void loop(){
   static unsigned long timeSinceLastMessage = 0;
   static int lastSteeringWheelPos = 0;
 
-  if(waitingForAck == false){
-    if(millis() - timeSinceLastMessage > 2000){
-      communication_send_message("BEAT");
+  //if(waitingForAck == false){
+    if((millis() - timeSinceLastMessage) > 2000){
+      communication_send_message("BEAT",0,BLUETOOTHCOM);
+      timeSinceLastMessage = millis();
       waitingForAck = true;
     }
-}
+  //}
 
   switch (ConStatus) {
     case 0:
@@ -34,6 +35,7 @@ void loop(){
         communication_parse_message(Parsed, &incommingMessage);
         Serial.println(Parsed[0]);
         if(Parsed[0] == "ACK"){
+          timeSinceLastMessage = millis();
           Serial.println("ACK");
           waitingForAck = false;
           ConStatus = OK;
@@ -46,17 +48,21 @@ void loop(){
       if(communication_read_message(&incommingMessage)){
         String Parsed [2];
         communication_parse_message(Parsed, &incommingMessage);
+        timeSinceLastMessage = millis();
         if (Parsed[0] == "TRL_OFF"){
           TrailerStatus = OFF;
           communication_send_message(Parsed[0], Parsed[1].toInt(), BLUETOOTHCOM);
+          communication_send_message("Ack",0,BLUETOOTHCOM);
         }
         else if (Parsed[0] == "TRL_SOUND"){
           TrailerStatus = SOUND;
           communication_send_message(Parsed[0], Parsed[1].toInt(), BLUETOOTHCOM);
+          communication_send_message("Ack",0,BLUETOOTHCOM);
         }
-        else if (Parsed[0] == "TLR_ASSIST"){
+        else if (Parsed[0] == "TRL_ASSIST"){
           TrailerStatus = ASSIST;
           communication_send_message(Parsed[0], Parsed[1].toInt(), BLUETOOTHCOM);
+          communication_send_message("Ack",0,BLUETOOTHCOM);
         }
         else if (
           Parsed[0] == "TRAILER_CONECTION"||
